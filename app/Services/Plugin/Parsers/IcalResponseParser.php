@@ -36,9 +36,10 @@ class IcalResponseParser implements ResponseParser
             $this->parser->parseString($normalizedBody);
 
             $events = $this->parser->getEvents()->sorted()->getArrayCopy();
-            $now = now()->startOfDay();
+            $windowStart = now()->subDays(7);
+            $windowEnd = now()->addDays(30);
 
-            $filteredEvents = array_values(array_filter($events, function (array $event) use ($now): bool {
+            $filteredEvents = array_values(array_filter($events, function (array $event) use ($windowStart, $windowEnd): bool {
                 $startDate = $this->asCarbon($event['DTSTART'] ?? null);
                 $endDate = $this->asCarbon($event['DTEND'] ?? null);
 
@@ -46,11 +47,7 @@ class IcalResponseParser implements ResponseParser
                     return false;
                 }
 
-                if ($startDate->gte($now) || $endDate->gte($now)) {
-                    return true;
-                }
-
-                return false;
+                return $startDate->between($windowStart, $windowEnd, true) || $endDate->between($windowStart, $windowEnd, true) || $windowStart->between($startDate, $endDate, true) && $windowEnd->between($startDate, $endDate, true);
             }));
 
             $normalizedEvents = array_map($this->normalizeIcalEvent(...), $filteredEvents);
