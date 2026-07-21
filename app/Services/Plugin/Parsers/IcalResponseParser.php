@@ -36,8 +36,9 @@ class IcalResponseParser implements ResponseParser
             $this->parser->parseString($normalizedBody);
 
             $events = $this->parser->getEvents()->sorted()->getArrayCopy();
-            $windowStart = now()->subDays(7);
-            $windowEnd = now()->addDays(30);
+            $today = now()->startOfDay();
+            $windowStart = $today->subDays(7);
+            $windowEnd = $today->addDays(30);
 
             $filteredEvents = array_values(array_filter($events, function (array $event) use ($windowStart, $windowEnd): bool {
                 $startDate = $this->asCarbon($event['DTSTART'] ?? null);
