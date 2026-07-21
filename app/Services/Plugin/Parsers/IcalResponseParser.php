@@ -47,7 +47,7 @@ class IcalResponseParser implements ResponseParser
                     return false;
                 }
 
-                return $startDate->between($windowStart, $windowEnd, true) || $endDate->between($windowStart, $windowEnd, true) || $windowStart->between($startDate, $endDate, true) && $windowEnd->between($startDate, $endDate, true);
+                return $startDate->gte($windowStart) && $startDate->lt($windowEnd) || $endDate->gt($windowStart) && $endDate->lte($windowEnd) || $windowStart->gte($startDate) && $windowEnd->lte($endDate);
             }));
 
             $normalizedEvents = array_map($this->normalizeIcalEvent(...), $filteredEvents);
