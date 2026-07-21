@@ -49,14 +49,17 @@ dataset('multiday-window-cases', [
 
     // 12. Starts inside window, ends after window -> include
     ['20260320', '20260420', true],
-
-    // 13. Starts on window end day, ends after window -> include
-    ['20260409', '20260420', true],
 ]);
 
 dataset('test-nows', [
     'midnight' => '2026-03-10 00:00:00',
     'noon'     => '2026-03-10 12:00:00',
+]);
+
+dataset('special-cases', [
+    // 13. Starts on window end day, ends after window
+    ['20260409', '20260420', false, '2026-03-10 00:00:00'],
+    ['20260409', '20260420', true, '2026-03-10 12:00:00'],
 ]);
 
 test('IcalResponseParser filters multiday events correctly within the time window', function (
@@ -106,4 +109,5 @@ ICS;
     Carbon::setTestNow();
 })
     ->with('multiday-window-cases')
-    ->with('test-nows');
+    ->with('test-nows')
+    ->with('special-cases');
